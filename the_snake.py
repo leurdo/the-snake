@@ -88,10 +88,14 @@ class Apple(GameObject):
 
     def __init__(
         self,
-        snake_positions: list[Position] = [GRID_CENTER]
+        snake_positions: list[Position] | None = None
     ) -> None:
         super().__init__(APPLE_COLOR)
-        self.snake_positions = snake_positions
+        self.snake_positions = (
+            snake_positions
+            if snake_positions is not None
+            else [GRID_CENTER]
+        )
 
     def randomize_position(self) -> None:
         """Установить случайную позицию яблока на игровом поле."""
