@@ -91,6 +91,7 @@ class Apple(GameObject):
     ) -> None:
         super().__init__(APPLE_COLOR)
         self.snake_positions = snake_positions or [GRID_CENTER]
+        self.randomize_position()
 
     def randomize_position(self) -> None:
         """Установить случайную позицию яблока на игровом поле."""
@@ -182,9 +183,6 @@ def main() -> None:
 
     snake = Snake()
     apple = Apple(snake.positions)
-    # Я все-таки оставлю этот метод, потому что иначе первое яблоко всегда
-    # создается в центре
-    apple.randomize_position()
 
     while True:
         clock.tick(SPEED)
@@ -200,6 +198,7 @@ def main() -> None:
         elif snake.get_head_position() in snake.positions[1:]:
             snake.reset()
             screen.fill(BOARD_BACKGROUND_COLOR)
+            apple.randomize_position()
 
         snake.draw()
         apple.draw()
