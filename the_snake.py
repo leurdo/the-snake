@@ -66,8 +66,7 @@ class GameObject:
         with_border: bool = True
     ) -> None:
         """Отрисовать одну ячейку заданного цвета"""
-        if color is None:
-            color = self.body_color
+        color = color or self.body_color
         rect = pg.Rect(
             position,
             (GRID_SIZE, GRID_SIZE),
@@ -91,21 +90,15 @@ class Apple(GameObject):
         snake_positions: list[Position] | None = None
     ) -> None:
         super().__init__(APPLE_COLOR)
-        self.snake_positions = (
-            snake_positions
-            if snake_positions is not None
-            else [GRID_CENTER]
-        )
+        self.snake_positions = snake_positions or [GRID_CENTER]
 
     def randomize_position(self) -> None:
         """Установить случайную позицию яблока на игровом поле."""
-        while True:
+        while self.position in self.snake_positions:
             self.position = (
                 randint(0, GRID_WIDTH - 1) * GRID_SIZE,
                 randint(0, GRID_HEIGHT - 1) * GRID_SIZE,
             )
-            if self.position not in self.snake_positions:
-                break
 
     def draw(self) -> None:
         """Отрисовать яблоко"""
@@ -157,11 +150,8 @@ class Snake(GameObject):
         if self.last:
             self.draw_cell(self.last, BOARD_BACKGROUND_COLOR, False)
 
-        # Отрисовка хвоста змейки.
-        self.draw_cell(self.positions[-1])
-
         # Отрисовка головы змейки.
-        self.draw_cell(self.positions[0])
+        self.draw_cell(self.get_head_position())
 
     def reset(self) -> None:
         """Вернуть змейку и игровое поле в исходное состояние"""
@@ -169,7 +159,7 @@ class Snake(GameObject):
         self.direction = RIGHT
         self.next_direction = None
         self.last = None
-        self.positions = [self.position]
+        self.positions[:] = [GRID_CENTER]
 
 
 def handle_keys(game_object: Snake) -> None:
@@ -191,7 +181,9 @@ def main() -> None:
     pg.init()
 
     snake = Snake()
-    apple = Apple()
+    apple = Apple(snake.positions)
+    # Я все-таки оставлю этот метод, потому что иначе первое яблоко всегда
+    # создается в центре
     apple.randomize_position()
 
     while True:
